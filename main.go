@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	ec := ecdsa.NewECDSA(elliptic.Secp256r1)
+	ec := ecdsa.NewECDSA(elliptic.Secp256k1)
 
 	// Generate a private key
 	privKey, err := ec.GeneratePrivateKey(rand.Reader)
