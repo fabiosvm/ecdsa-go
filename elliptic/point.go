@@ -52,3 +52,13 @@ func (p *Point) String() string {
 func (p *Point) IsAtInfinity() bool {
 	return p.X == nil && p.Y == nil
 }
+
+func (p *Point) IsEqual(other *Point) bool {
+	if p.IsAtInfinity() && other.IsAtInfinity() {
+		return true
+	}
+	if p.IsAtInfinity() || other.IsAtInfinity() {
+		return false
+	}
+	return p.X.Cmp(other.X) == 0 && p.Y.Cmp(other.Y) == 0
+}

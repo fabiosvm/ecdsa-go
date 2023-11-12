@@ -46,12 +46,7 @@ func main() {
 	fmt.Printf("Signature: %s\n", sig.String())
 
 	// Verify the signature
-	ok, err := ec.VerifySignature(hash[:], sig, pubKey)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error verifying signature: %s\n", err)
-		os.Exit(1)
-	}
-
+	ok := ec.VerifySignature(hash[:], sig, pubKey)
 	if ok {
 		fmt.Println("Wow! Signature is valid.")
 	} else {

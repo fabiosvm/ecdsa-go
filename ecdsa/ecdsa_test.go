@@ -106,11 +106,7 @@ func TestSignAndVerifySignature(t *testing.T) {
 		t.Error(err)
 	}
 
-	ok, err := ec.VerifySignature(hash[:], sig, pubKey)
-	if err != nil {
-		t.Error(err)
-	}
-
+	ok := ec.VerifySignature(hash[:], sig, pubKey)
 	if !ok {
 		t.Error("Expected signature to be valid.")
 	}

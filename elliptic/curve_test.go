@@ -10,7 +10,7 @@ func TestIsValidScalar(t *testing.T) {
 	// TODO: Implement this test.
 }
 
-func TestContainsPoint(t *testing.T) {
+func TestIsOnCurve(t *testing.T) {
 	// TODO: Implement this test.
 }
 
