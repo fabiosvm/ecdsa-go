@@ -86,6 +86,10 @@ func TestPublicKey(t *testing.T) {
 	}
 }
 
+func TestCompressAndDecompressPublicKey(t *testing.T) {
+	// TODO: Implement this test.
+}
+
 func TestSignAndVerifySignature(t *testing.T) {
 	ec := NewECDSA(elliptic.Secp256r1)
 

@@ -14,6 +14,10 @@ func TestIsOnCurve(t *testing.T) {
 	// TODO: Implement this test.
 }
 
+func TestComputeY(t *testing.T) {
+	// TODO: Implement this test.
+}
+
 func TestAddPoints(t *testing.T) {
 	// TODO: Implement this test.
 }

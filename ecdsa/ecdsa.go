@@ -53,6 +53,37 @@ func (e *ECDSA) PublicKey(privKey *PrivateKey) (*PublicKey, error) {
 	return NewPublicKey(p), nil
 }
 
+func (e *ECDSA) CompressPublicKey(pubKey *PublicKey) ([]byte, error) {
+	if !e.PublicKeyIsValid(pubKey) {
+		return nil, errors.New("Invalid public key")
+	}
+	b := byte(0x02)
+	if pubKey.P.Y.Bit(0) == 1 {
+		b = 0x03
+	}
+	compressed := make([]byte, e.Curve.KeySize+1)
+	compressed[0] = b
+	xBytes := pubKey.P.X.Bytes()
+	copy(compressed[1:], xBytes)
+	return compressed, nil
+}
+
+func (e *ECDSA) DecompressPublicKey(bytes []byte) (*PublicKey, error) {
+	if len(bytes) != e.Curve.KeySize+1 {
+		return nil, errors.New("Invalid compressed public key")
+	}
+	xBytes := make([]byte, e.Curve.KeySize)
+	copy(xBytes, bytes[1:])
+	x := new(big.Int).SetBytes(xBytes)
+	b := bytes[0]
+	y, n := e.Curve.ComputeY(x)
+	if b == 0x03 {
+		y = n
+	}
+	p := elliptic.NewPoint(x, y)
+	return NewPublicKey(p), nil
+}
+
 func (e *ECDSA) Sign(hash []byte, privKey *PrivateKey, rand io.Reader) (*Signature, error) {
 	var r, s *big.Int
 	for {
@@ -71,7 +102,7 @@ func (e *ECDSA) Sign(hash []byte, privKey *PrivateKey, rand io.Reader) (*Signatu
 		t0 := new(big.Int).SetBytes(hash)
 		t1 := new(big.Int).ModInverse(k, e.Curve.N)
 		if t1 == nil {
-			panic("Cannot inverse k")
+			panic("ModInverse failed")
 		}
 		t2 := new(big.Int).Set(privKey.D)
 		t2 = t2.Mul(t2, r)
@@ -95,7 +126,7 @@ func (e *ECDSA) VerifySignature(hash []byte, sig *Signature, pubKey *PublicKey) 
 	w := new(big.Int).Set(s)
 	w = w.ModInverse(w, e.Curve.N)
 	if w == nil {
-		panic("Cannot inverse s")
+		panic("ModInverse failed")
 	}
 	// u1 = mod(hash * w, c.N)
 	u1 := new(big.Int).SetBytes(hash)

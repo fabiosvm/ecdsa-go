@@ -86,6 +86,27 @@ func (c *Curve) IsOnCurve(p *Point) bool {
 	return l.Cmp(r) == 0
 }
 
+func (c *Curve) ComputeY(x *big.Int) (*big.Int, *big.Int) {
+	// r = mod(x ** 3 + c.A * x + c.B, c.P)
+	t0 := new(big.Int).Set(x)
+	t0 = t0.Mul(t0, x)
+	t0 = t0.Mul(t0, x)
+	t1 := new(big.Int).Set(c.A)
+	t1 = t1.Mul(t1, x)
+	r := t0.Add(t0, t1)
+	r = r.Add(r, c.B)
+	r = r.Mod(r, c.P)
+	// y = modSqrt(r, c.P)
+	y := new(big.Int).Set(r)
+	y = y.ModSqrt(y, c.P)
+	if y == nil {
+		panic("ModSqrt failed")
+	}
+	n := new(big.Int).Neg(y)
+	n = n.Mod(n, c.P)
+	return y, n
+}
+
 func (c *Curve) AddPoints(p, q *Point) *Point {
 	if p.IsAtInfinity() {
 		return q
@@ -104,7 +125,7 @@ func (c *Curve) AddPoints(p, q *Point) *Point {
 	d = d.Sub(d, p.X)
 	d = new(big.Int).ModInverse(d, c.P)
 	if d == nil {
-		panic("Cannot inverse denominator")
+		panic("ModInverse failed")
 	}
 	lambda := n.Mul(n, d)
 	lambda = lambda.Mod(lambda, c.P)
@@ -136,7 +157,7 @@ func (c *Curve) DoublePoint(p *Point) *Point {
 	d = d.Mul(d, big.NewInt(2))
 	d = d.ModInverse(d, c.P)
 	if d == nil {
-		panic("Cannot inverse denominator")
+		panic("ModInverse failed")
 	}
 	lambda := n.Mul(n, d)
 	lambda = lambda.Mod(lambda, c.P)

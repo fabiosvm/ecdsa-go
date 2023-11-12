@@ -32,6 +32,24 @@ func main() {
 
 	fmt.Printf("Public key: %s\n", pubKey.String())
 
+	// Compress the public key
+	compressedPubKey, err := ec.CompressPublicKey(pubKey)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error compressing public key: %s\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Compressed public key: %s\n", hex.EncodeToString(compressedPubKey))
+
+	// Decompress the public key
+	decompressedPubKey, err := ec.DecompressPublicKey(compressedPubKey)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error decompressing public key: %s\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Decompressed public key: %s\n", decompressedPubKey.String())
+
 	// Generate the hash of a message
 	hash := sha256.Sum256([]byte("foo"))
 	fmt.Printf("Hash: %s\n", hex.EncodeToString(hash[:]))
